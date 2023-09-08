@@ -18,9 +18,11 @@
 
 - 나머지 잡 box 스타일들은 decoration : BoxDecoration()속성 안에 집어넣어야함, border 에서 color잡을때 color 중복정의 되면 오류날때 있음 주의
 
+- ListView : Column 과 사용법 동일 : 스크롤 바 생김, 스크롤 위치 감시 가능, 메모리 절약가능
 
+- ListView.bilder : itemCount 와 itemBuilder(로직) 을 같이 사용하여 반복문으로 사용가능
 
-
+- floatingActionButton : 하단에 둥근 버튼을 띄움
 
 ## 공간 안나올때
 ```dart

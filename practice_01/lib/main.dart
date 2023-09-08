@@ -2,39 +2,46 @@ import 'package:flutter/material.dart';
 
 void main() {
   // app 을 시작하라
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var name = ["가가가", "나나나", "다다다"];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: () {},
+            );
+          },
+        ),
         appBar: AppBar(),
-        body: ShopItem(),
+        body: ListView.builder(
+            // Dialog() 쓰면 그냥 나옴
+            itemCount: name.length,
+            itemBuilder: (c, i) {
+              return ListTile(
+                leading: Icon(
+                  Icons.account_circle,
+                  size: 50,
+                  color: Colors.black,
+                ),
+                title: Text(name[i]),
+              );
+            }),
       ),
     );
   }
 }
-
-/// 위젯 분리방법
-/// class 작명 stless
-/// return 옆에 축약할 레이아웃 넣기
-class ShopItem extends StatelessWidget {
-  const ShopItem({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      child: Text("안녕"),
-    );
-  }
-}
-
-// 변수로도 축약가능
-var a = SizedBox(
-  child: Text("안녕"),
-);
