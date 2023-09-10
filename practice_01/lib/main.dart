@@ -17,6 +17,23 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // 권한요청을 위한 함수
+  getPermission() async {
+    var status = await Permission.contacts.status; //연락처 권한줬는지 여부
+    if (status.isGranted) {
+      print("허락됨");
+    } else if (status.isDenied) {
+      print("거절됨");
+
+      // 팝업으로 권한을 요청하는 방법
+      Permission.contacts.request(); // 허락해달라고 팝업띄우는 코드
+      // 주의 : Android 11 이상 ios 환경에서는 거절 2번이상하면 다시는 팝업안뜸
+
+      // 유저가 직접 설정화면에서 권한을 키게 하는 방법 (유저가 어려움을 느끼니 지양)
+      // openAppSettings(); // 앱 설정화면 켜줌
+    }
+  }
+
   var title = "Contract";
   var numb;
   // 리스트 안에 map 이 있는 구조
@@ -25,9 +42,13 @@ class _MyAppState extends State<MyApp> {
     {"name": "안녕2", "tel": "010-1112-1112"},
   ];
 
+  // initState 안에 적은 코드는 위젯 로드될때 한번 실행됨
   @override
   void initState() {
     super.initState();
+
+    // 되도록 앱시작할때 권한요청 팝업을 띄우는 방법은 지양하자
+    // getPermission();
     numb = data.length;
   }
 
@@ -89,6 +110,12 @@ class _MyAppState extends State<MyApp> {
       appBar: AppBar(
         title: Text(numb.toString()),
         actions: [
+          IconButton(
+            onPressed: () {
+              getPermission();
+            },
+            icon: Icon(Icons.contacts),
+          ),
           ElevatedButton(
             onPressed: () {
               setState(() {
