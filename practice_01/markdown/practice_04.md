@@ -77,7 +77,7 @@ class _ShopItemState extends State<ShopItem> {
       // ),
       child: ListView.builder(
         itemBuilder: (context, index) {
-          print("인덱스 : $index");
+           print("인덱스 : $index"); 
           return ListTile(
             // leading: Icon(
             //   Icons.account_circle,

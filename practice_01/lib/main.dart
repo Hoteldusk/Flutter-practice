@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 void main() {
   // app 을 시작하라
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: MyApp()));
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -13,7 +16,32 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var name = ["가가가", "나나나", "다다다"];
+  var title = "Contract";
+  var numb;
+  var names = ["가가가", "나나나", "다다다"];
+
+  @override
+  void initState() {
+    super.initState();
+    numb = names.length;
+  }
+
+  nameListAdd(text) {
+    print("text : $text");
+    if (text == "") {
+      return false;
+    }
+    setState(() {
+      names.add(text);
+    });
+  }
+
+  numberAdd() {
+    setState(() {
+      numb = names.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // 여기서 context는 Scaffold 의 부모위젯 => MaterialApp
@@ -33,16 +61,43 @@ class _MyAppState extends State<MyApp> {
                 // 이러면 안뜸
                 // 해결방법 : MaterialApp() 을 바깥으로 보내면됨
 
-                return MyDialog();
+                // 자식 widget에게 state 전송하는 법
+                // 1. 전달
+                // (전송할변수이름 : 전송할 값)
+
+                // 2. 등록
+                // 그 후 자식 widget에 가서 생성자에 변수이름 기재, final 로 변수선언
+
+                // 3. 사용
+                // 자식위젯에서 변수가지고 사용하면됨 단, 부모가 보낸 state는 변경안하는것을 권장, final로 선언
+                return MyDialog(
+                  title: title,
+                  numberAdd: numberAdd,
+                  nameListAdd: nameListAdd,
+                );
               },
             );
           },
         );
       }),
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(numb.toString()),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                names.sort();
+              });
+            },
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.blue[300])),
+            child: Text("정렬"),
+          ),
+        ],
+      ),
       body: ListView.builder(
         // Dialog() 쓰면 그냥 나옴
-        itemCount: name.length,
+        itemCount: names.length,
         itemBuilder: (c, i) {
           return ListTile(
             leading: Icon(
@@ -50,7 +105,17 @@ class _MyAppState extends State<MyApp> {
               size: 50,
               color: Colors.black,
             ),
-            title: Text(name[i]),
+            title: Text(names[i]),
+            trailing: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  // 리스트에서 특정인덱스 제거
+                  names.removeAt(i);
+                  numb = names.length;
+                });
+              },
+              child: Text("삭제"),
+            ),
           );
         },
       ),
@@ -58,10 +123,24 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class MyDialog extends StatelessWidget {
+class MyDialog extends StatefulWidget {
   const MyDialog({
     super.key,
+    this.title,
+    this.numberAdd,
+    this.nameListAdd,
   });
+  final title;
+  final numberAdd;
+  final nameListAdd;
+
+  @override
+  State<MyDialog> createState() => _MyDialogState();
+}
+
+class _MyDialogState extends State<MyDialog> {
+  // var inputData = TextEditingController();
+  var localInputText = "";
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +152,16 @@ class MyDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Contact",
+              widget.title,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            TextField(),
+            TextField(
+              // 웹개발 처럼 onChanged 사용가능 사용자가 입력한 값 : text, 값이 바뀔때 마다 실행이됨
+              // onChanged: (text) {},
+              onChanged: (text) {
+                localInputText = text;
+              },
+            ),
             Container(
               margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
               child: Row(
@@ -93,6 +178,8 @@ class MyDialog extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
+                      widget.nameListAdd(localInputText);
+                      widget.numberAdd();
                       Navigator.pop(context);
                     },
                     child: Text(
