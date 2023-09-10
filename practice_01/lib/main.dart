@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   // app 을 시작하라
@@ -18,27 +19,32 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   var title = "Contract";
   var numb;
-  var names = ["가가가", "나나나", "다다다"];
+  // 리스트 안에 map 이 있는 구조
+  var data = [
+    {"name": "안녕1", "tel": "010-1111-1111"},
+    {"name": "안녕2", "tel": "010-1112-1112"},
+  ];
 
   @override
   void initState() {
     super.initState();
-    numb = names.length;
+    numb = data.length;
   }
 
-  nameListAdd(text) {
-    print("text : $text");
-    if (text == "") {
+  dataListAdd(nameText, phoneText) {
+    print("nameText : $nameText");
+    print("phoneText : $phoneText");
+    if (nameText == "" || phoneText == "") {
       return false;
     }
     setState(() {
-      names.add(text);
+      data.add({"name": nameText.toString(), "tel": phoneText.toString()});
     });
   }
 
   numberAdd() {
     setState(() {
-      numb = names.length;
+      numb = data.length;
     });
   }
 
@@ -73,7 +79,7 @@ class _MyAppState extends State<MyApp> {
                 return MyDialog(
                   title: title,
                   numberAdd: numberAdd,
-                  nameListAdd: nameListAdd,
+                  dataListAdd: dataListAdd,
                 );
               },
             );
@@ -86,7 +92,9 @@ class _MyAppState extends State<MyApp> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                names.sort();
+                // Nullable 처리를 해줘야함
+                data.sort(
+                    (a, b) => a["name"]?.compareTo(b["name"].toString()) ?? 0);
               });
             },
             style: ButtonStyle(
@@ -97,21 +105,53 @@ class _MyAppState extends State<MyApp> {
       ),
       body: ListView.builder(
         // Dialog() 쓰면 그냥 나옴
-        itemCount: names.length,
+        itemCount: data.length,
         itemBuilder: (c, i) {
           return ListTile(
-            leading: Icon(
-              Icons.account_circle,
-              size: 50,
+            leading: IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (build) {
+                    return Dialog(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "전화번호 : ${data[i]["tel"]}",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "OK",
+                                style: TextStyle(fontSize: 25),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              icon: Icon(
+                Icons.account_circle,
+                size: 35,
+              ),
               color: Colors.black,
             ),
-            title: Text(names[i]),
+            title: Text(data[i]["name"].toString()),
             trailing: ElevatedButton(
               onPressed: () {
                 setState(() {
                   // 리스트에서 특정인덱스 제거
-                  names.removeAt(i);
-                  numb = names.length;
+                  data.removeAt(i);
+                  numb = data.length;
                 });
               },
               child: Text("삭제"),
@@ -128,11 +168,11 @@ class MyDialog extends StatefulWidget {
     super.key,
     this.title,
     this.numberAdd,
-    this.nameListAdd,
+    this.dataListAdd,
   });
   final title;
   final numberAdd;
-  final nameListAdd;
+  final dataListAdd;
 
   @override
   State<MyDialog> createState() => _MyDialogState();
@@ -140,7 +180,8 @@ class MyDialog extends StatefulWidget {
 
 class _MyDialogState extends State<MyDialog> {
   // var inputData = TextEditingController();
-  var localInputText = "";
+  var localInputNameText = "";
+  var localInputPhoneText = "";
 
   @override
   Widget build(BuildContext context) {
@@ -159,8 +200,17 @@ class _MyDialogState extends State<MyDialog> {
               // 웹개발 처럼 onChanged 사용가능 사용자가 입력한 값 : text, 값이 바뀔때 마다 실행이됨
               // onChanged: (text) {},
               onChanged: (text) {
-                localInputText = text;
+                localInputNameText = text;
               },
+              decoration: InputDecoration(hintText: "이름을 입력하세요"),
+            ),
+            TextField(
+              // 웹개발 처럼 onChanged 사용가능 사용자가 입력한 값 : text, 값이 바뀔때 마다 실행이됨
+              // onChanged: (text) {},
+              onChanged: (text) {
+                localInputPhoneText = text;
+              },
+              decoration: InputDecoration(hintText: "전화 번호를 입력하세요"),
             ),
             Container(
               margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
@@ -178,7 +228,8 @@ class _MyDialogState extends State<MyDialog> {
                   ),
                   TextButton(
                     onPressed: () {
-                      widget.nameListAdd(localInputText);
+                      widget.dataListAdd(
+                          localInputNameText, localInputPhoneText);
                       widget.numberAdd();
                       Navigator.pop(context);
                     },
