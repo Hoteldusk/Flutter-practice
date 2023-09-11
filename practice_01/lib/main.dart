@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:contacts_service/contacts_service.dart';
 
 void main() {
   // app 을 시작하라
@@ -19,9 +20,42 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // 권한요청을 위한 함수
   getPermission() async {
-    var status = await Permission.contacts.status; //연락처 권한줬는지 여부
+    var status = await Permission.contacts.status;
     if (status.isGranted) {
+      //연락처 권한줬는지 여부
       print("허락됨");
+      // 연락처 꺼내는 코드 (await 권장)
+      var contacts = await ContactsService.getContacts();
+      // print(contacts);
+      // [Instance of 'Contact', Instance of 'Contact'] 이런식으로 뜸 첫째 연락처, 둘째 연락처
+      print(contacts[0].familyName); //성   출력
+      print(contacts[0].givenName); //이름 출력
+      print(contacts[0].displayName); // 전체 이름 출력
+      print(contacts[1].displayName);
+      print(contacts[0].phones?[0].value);
+      // 연락처 추가하는 법
+      // var newPerson = Contact(); // new 키워드 생략
+      // newPerson.givenName = '라에몽';
+      // newPerson.givenName = '도';
+      // await ContactsService.addContact(newPerson); //휴대폰 연락처에 newPserson 정보가 들어감
+
+      // 연락처 받아오기
+      // data = contacts;
+      // state 변경은 setState() 안에
+      // type 에러 가남 dart는 type을 타입을 잘 지켜야함
+      // 해결책 1 : 타입 캐스팅 : 변수하나에 타입여러개 가능
+      // 해결책 2 : Union Type
+      // 해결책 3 : Dynamic Type
+      // 해결책 4 : 변수 만들때 미리 타입을 강제 지정할 수도 있음
+      setState(() {
+        for (var contact in contacts) {
+          var localdata = {};
+          localdata['name'] = contact.displayName;
+          localdata['tel'] = contact.phones?[0].value;
+          data.add(localdata);
+        }
+        numberAdd();
+      });
     } else if (status.isDenied) {
       print("거절됨");
 
@@ -37,10 +71,7 @@ class _MyAppState extends State<MyApp> {
   var title = "Contract";
   var numb;
   // 리스트 안에 map 이 있는 구조
-  var data = [
-    {"name": "안녕1", "tel": "010-1111-1111"},
-    {"name": "안녕2", "tel": "010-1112-1112"},
-  ];
+  var data = [];
 
   // initState 안에 적은 코드는 위젯 로드될때 한번 실행됨
   @override
