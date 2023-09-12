@@ -2,6 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:contacts_service/contacts_service.dart';
 
+// 본프로젝트에서는 연락처를 받아오는 기능이 있기때문에,
+// 사용자의 연락처에 빠진 값이 있느지 없는지 고려를 해줘야함
+
+// 어플 발행하기 전에 확인사항
+// 1. 변수, 함수에 타입 지정 잘했는가?
+// 2. null check 가 잘 되어있는가?
+
+// 어플 발행방법
+// 1. APK 로 생성하여 테스트
+// 명령어 : flutter build apk --release --target-platform=android-arm64
+
+// 2. playStore 에 올리려면 .abb 로 파일을 만들고 keyfile 파일을 만들고 사인해줘야함
+
 void main() {
   // app 을 시작하라
   runApp(MaterialApp(
@@ -25,19 +38,17 @@ class _MyAppState extends State<MyApp> {
       //연락처 권한줬는지 여부
       print("허락됨");
       // 연락처 꺼내는 코드 (await 권장)
-      var contacts = await ContactsService.getContacts();
+      var contacts =
+          await ContactsService.getContacts(withThumbnails: false); //섬네일 이미지 제외
       // print(contacts);
       // [Instance of 'Contact', Instance of 'Contact'] 이런식으로 뜸 첫째 연락처, 둘째 연락처
-      print(contacts[0].familyName); //성   출력
-      print(contacts[0].givenName); //이름 출력
+      // print(contacts[0].familyName); //성   출력
+      // print(contacts[0].givenName); //이름 출력
       print(contacts[0].displayName); // 전체 이름 출력
-      print(contacts[1].displayName);
       print(contacts[0].phones?[0].value);
-      // 연락처 추가하는 법
-      // var newPerson = Contact(); // new 키워드 생략
-      // newPerson.givenName = '라에몽';
-      // newPerson.givenName = '도';
-      // await ContactsService.addContact(newPerson); //휴대폰 연락처에 newPserson 정보가 들어감
+      print(contacts[1].displayName);
+
+      print(contacts);
 
       // 연락처 받아오기
       // data = contacts;
@@ -47,11 +58,14 @@ class _MyAppState extends State<MyApp> {
       // 해결책 2 : Union Type
       // 해결책 3 : Dynamic Type
       // 해결책 4 : 변수 만들때 미리 타입을 강제 지정할 수도 있음
+      print("heelloheelloheelloheello");
       setState(() {
         for (var contact in contacts) {
           var localdata = {};
-          localdata['name'] = contact.displayName;
-          localdata['tel'] = contact.phones?[0].value;
+          localdata['name'] = contact.displayName ?? "이름없음";
+
+          localdata['tel'] = contact.phones?[0].value ?? "번호없음";
+
           data.add(localdata);
         }
         numberAdd();
@@ -68,10 +82,10 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  var title = "Contract";
+  String title = "Contract";
+  var data = [];
   var numb;
   // 리스트 안에 map 이 있는 구조
-  var data = [];
 
   // initState 안에 적은 코드는 위젯 로드될때 한번 실행됨
   @override
@@ -91,6 +105,14 @@ class _MyAppState extends State<MyApp> {
     }
     setState(() {
       data.add({"name": nameText.toString(), "tel": phoneText.toString()});
+      //연락처 추가하는 법
+      var newPerson = Contact(); // new 키워드 생략
+      newPerson.givenName = nameText;
+      print(nameText);
+      newPerson.phones = [Item(label: 'mobile', value: phoneText)];
+      print("newPerson.phones?[0].value : ${newPerson.phones?[0].value}");
+      ContactsService.addContact(
+          newPerson); //휴대폰 연락처에 newPserson 정보가 들어감 await 권장
     });
   }
 
