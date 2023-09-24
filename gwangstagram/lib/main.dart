@@ -8,10 +8,17 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+
+import 'upload_page.dart';
 
 void main() {
-  runApp(
-    MaterialApp(
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (c) => Store1()),
+      ChangeNotifierProvider(create: (c) => Store2()),
+    ],
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MyApp(),
       theme: style.theme,
@@ -22,7 +29,42 @@ void main() {
       //   'detail': (context) => Text("둘째페이지")
       // },
     ),
-  );
+  ));
+}
+
+class Store1 extends ChangeNotifier {
+  var follower = 0;
+  var isfollower = false;
+  var profileImage = [];
+
+  getData() async {
+    var result = await http
+        .get(Uri.parse('https://codingapple1.github.io/app/profile.json'));
+    var result2 = jsonDecode(result.body);
+    profileImage = result2;
+    notifyListeners();
+  }
+
+  addFollower() {
+    if (isfollower) {
+      isfollower = false;
+      follower--;
+    } else {
+      isfollower = true;
+      follower++;
+    }
+    notifyListeners();
+  }
+}
+
+class Store2 extends ChangeNotifier {
+  var name = 'john kim';
+
+  changeName() {
+    name = 'john park';
+    // state 수정후 재렌더링
+    notifyListeners();
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -71,7 +113,13 @@ class _MyAppState extends State<MyApp> {
     // initState 에다가 sync붙이지 말고 함수하나 만들어서 sync를 붙이자
     var result = await http
         .get(Uri.parse("https://codingapple1.github.io/app/data.json"));
+    if (result.statusCode == 200) {
+      // 데이터 불러오기 성공
+    } else {
+      // 데이터 불러오기 실패
+    }
     var result2 = jsonDecode(result.body);
+    // Dio 패키지 사용하면 GET 요청이 더 짧아진다
     setState(() {
       dataList = result2;
     });
@@ -212,56 +260,6 @@ class _MyAppState extends State<MyApp> {
             label: "Shop",
           ),
         ],
-      ),
-    );
-  }
-}
-
-class Upload extends StatelessWidget {
-  const Upload({
-    super.key,
-    this.userImage,
-    this.setUserContent,
-    this.addMyData,
-  });
-
-  final userImage;
-  final setUserContent;
-  final addMyData;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text("Gwangstagram"),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.close),
-            ),
-            Image.file(userImage),
-            TextField(
-              onChanged: (text) {
-                setUserContent(text);
-              },
-            ),
-            // 발행버튼 누르면 글 발행?
-            IconButton(
-              onPressed: () {
-                addMyData();
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.add_circle_outline),
-            )
-          ],
-        ),
       ),
     );
   }

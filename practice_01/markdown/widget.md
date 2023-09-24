@@ -1,4 +1,4 @@
-# 많이 쓰는 위젯 개념 정리
+# 많이 쓰는 위젯 정리
 - MateriaApp 쓰면 구글이 제공하는 위젯 사용가능, 기타 설정도 자동으로 설정됨
 - 글자   : `Text("")`
 - 아이콘 : `Icon(Icons.아이콘이름)`
@@ -21,18 +21,31 @@
 - ListView : Column 과 사용법 동일 : 스크롤 바 생김, 스크롤 위치 감시 가능, 메모리 절약가능
 
 - ListView.bilder : itemCount 와 itemBuilder(로직) 을 같이 사용하여 반복문으로 사용가능
-
+```dart
+ListView.builder(
+  itemCount: 정수형,
+  itemBuilder: (context, index) {
+    return ListTile(
+      leading:
+      title:
+      trailing:
+    );
+  }
+)
+```
 - floatingActionButton : 하단에 둥근 버튼을 띄움
 
 - TextButton, IconButton, ElevatedButton : 대표적인 버튼 3개
 
-## 공간 안나올때
+- 화면전환을 하고싶다면?
 ```dart
-home: Container(
-    /// 사이즈 는 LP, 50LP 는 1.2cm
-    /// 박스가 꽉차는 이유는 어디서부터 50차지할지 몰라서 그럼
-    width: 50,
-    height: 50
-)
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => Text("위젯"),
+  ),
+);
 ```
+
+- GestureDetector : Text 에 onTap 기능을 넣을수있음 (onDoubleTap 두번 클릭), (onHorizontalDragStart  왼쪽으로 swipe했을때 기능), (onLongPress 확대했을때)
 

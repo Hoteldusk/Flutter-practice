@@ -17,6 +17,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 ```
 
+### http상태 처리가 번거롭다면 FutureBuilder 사용
+- 단 데이터가 나중에 추가안되는 경우에 사용하자 자주추가되면 쓰지말자
+```dart
+FutureBuilder(future: http.get(), builder: (){})
+// future: 에 입력한 Future 가 완료되면 builder: 안의 위젯을 보여준다
+```
+
+
 ## 페이지 나누는법
 1. Tab
 2. Navigator => 페이지 위에다가 덮어 씌움(Stack 으로 관리해줌)

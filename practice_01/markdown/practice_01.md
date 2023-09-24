@@ -1,4 +1,15 @@
 # 연습 1
+
+## 공간 안나올때
+```dart
+home: Container(
+    /// 사이즈 는 LP, 50LP 는 1.2cm
+    /// 박스가 꽉차는 이유는 어디서부터 50차지할지 몰라서 그럼
+    width: 50,
+    height: 50
+)
+```
+
 ```dart
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

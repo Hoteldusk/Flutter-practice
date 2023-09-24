@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'profile_page.dart';
+
 class MainList extends StatelessWidget {
   const MainList({
     super.key,
@@ -10,11 +12,15 @@ class MainList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: dataList.length,
-        itemBuilder: (c, i) {
-          return BusanContent(data: dataList[i]);
-        });
+    if (dataList.isNotEmpty) {
+      return ListView.builder(
+          itemCount: dataList.length,
+          itemBuilder: (c, i) {
+            return BusanContent(data: dataList[i]);
+          });
+    } else {
+      return Text("로딩중");
+    }
   }
 }
 
@@ -57,11 +63,28 @@ class BusanContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Text에 onPressed 넣고싶으면 GestureDetector 사용
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, a1, a2) => Profile(),
+                      transitionsBuilder: (context, a1, a2, child) =>
+                          FadeTransition(opacity: a1, child: child),
+                      transitionDuration: Duration(milliseconds: 500),
+                    ),
+                  );
+                },
+                child: Text(
+                  "글쓴이 : ${data['user']}",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
               Text(
                 "좋아요 : ${data['likes']}",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text("글쓴이 : ${data['user']}"),
               Text("내용 : ${data['content']}"),
               Text("날짜 : ${data['date']}"),
             ],

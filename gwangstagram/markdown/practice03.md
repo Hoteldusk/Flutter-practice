@@ -42,6 +42,42 @@ var storage = await SharedPreferences.getInstance();
  // print("result:$result");
  // 삭제
  // storage.remove('name');
- 
+
 }
 ```
+
+## 페이지 전환 커스텀 애니메이션
+1. CupertinoPageRoute 사용 => 오른쪽에서 왼쪽으로 화면슬라이드 되면서 전환됨
+2. PageRouteBuilder 사용
+```dart
+PageRouteBuilder(
+    pageBuilder: (context, a1, a2) => Profile(),
+)
+```
+- 커스텀 애니메이션 추가가능
+```dart
+PageRouteBuilder(
+    pageBuilder: (context, a1, a2) => Profile(),
+    transitionsBuilder: (context, a1, a2, child) => FadeTransition(opacity: a1, child: child),
+    // transitionsBuilder 에 애니메이션 위젯을 추가하면된다
+    // child : 전환시킬 화면 위젯을 뜻함(Profile())
+    // a1 : animation object 페이지 전환 얼마나 되었는지 0~1 로 알려줌
+)
+```
+- 애니메이션 위젯의 종류
+- `FadeTransition()` `PositionedTransition()` `ScaleTransition()` `RotationTransition()` `SlideTransition()`
+
+- sildeTransition 예시
+```dart
+SlideTransition(
+      position: Tween(
+              begin: Offset(-1.0, 0.0),
+              end: Offset(0.0, 0.0))
+          .animate(a1),
+      child: child,
+    )
+```
+- 페이지 전환시 쓰는 Hero() 위젯도 있으니 참고
+
+- 속도조절을 하고싶으면?
+- `transitionDuration: Duration(milliseconds: 밀리초입력)` 추가
