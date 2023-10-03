@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gwangstagram/main_page.dart';
+import 'package:gwangstagram/notification.dart';
 import 'package:gwangstagram/style.dart' as style;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -164,8 +165,8 @@ class _MyAppState extends State<MyApp> {
     //     http.get(Uri.parse('https://codingapple1.github.io/app/data.json'));
     // print(result.body);
     // http 함수도 오래걸리는 함수임 (Future)
+    initNotification(context);
     getData();
-
     saveData();
   }
 
@@ -173,6 +174,12 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // BuildContext context 이게 push 메서드 매개변수로 들어감
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showNotification();
+        },
+        child: Text('+'),
+      ),
       appBar: AppBar(
         title: Text("Gwangstagram"),
         actions: [
