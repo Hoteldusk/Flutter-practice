@@ -106,3 +106,85 @@ await notifications.initialize(initializationSettings,
   }
 )
 ```
+
+### 주기적으로 알람띄우기
+- 특정시간에 알람추가 (notification.dart) 에 코드 추가
+```dart
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+showNotification2() async {
+
+  tz.initializeTimeZones();
+
+  var androidDetails = const AndroidNotificationDetails(
+    '유니크한 알림 ID',
+    '알림종류 설명',
+    priority: Priority.high,
+    importance: Importance.max,
+    color: Color.fromARGB(255, 255, 0, 0),
+  );
+  var iosDetails = const IOSNotificationDetails(
+    presentAlert: true,
+    presentBadge: true,
+    presentSound: true,
+  );
+
+  notifications.zonedSchedule(
+      2,
+      '제목2',
+      '내용2',
+      // 시간입력시 이 시간에 알람이 뜸
+      tz.TZDateTime.now(tz.local).add(Duration(seconds: 3)),
+      // tz.TZDateTime.now(tz.local) => 폰의 현재시간 , add() 로 시간 더하기 hours, days도 가능
+      // 반복해서 띄우고 싶다면? RepeatInterval.daily (hours 등 가능) 이걸로는 주기적인 시간에 띄우기는 불가능
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+      UILocalNotificationDateInterpretation.absoluteTime
+  );
+}
+```
+
+- 안될경우 AndroidManifest.xml 권한 추가후 localnotifications 버전 15로
+```xml
+<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+```
+
+- 매일 7시에 알림을 띄우고싶으면?
+```dart
+  notifications.zonedSchedule(
+      2,
+      '제목2',
+      '내용2',
+      makeDate(7, 0, 0),
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+      UILocalNotificationDateInterpretation.absoluteTime,
+
+      matchDateTimeComponents: DateTimeComponents.time // 매일 같은 시간에 알림띄워줌
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime // 매주 같은 시간에 알림띄워줌
+      matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime // 매달 같은 시간에 알림띄워줌
+      matchDateTimeComponents: DateTimeComponents.dateAndTime // 매년 같은 시간에 알림띄워줌
+  );
+
+  makeDate(hour, min, sec){
+  var now = tz.TZDateTime.now(tz.local);
+  var when = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, min, sec);
+  if (when.isBefore(now)) {
+    return when.add(Duration(days: 1));
+  } else {
+    return when;
+  }
+}
+```
+
+- 서버에서 보내는 push알림 띄우기
+```
+(GooglePlay는 항상 백그라운드에서 동작)
+<서버> ==(알림)==> <FirebaseCloudMessaging> ==(알림)==> <폰(Google Play)>
+각각의 데이터를 수신하는 과정알아보기
+```
+

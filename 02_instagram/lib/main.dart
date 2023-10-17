@@ -1,8 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gwangstagram/main_page.dart';
 import 'package:gwangstagram/notification.dart';
+import 'package:gwangstagram/shop.dart';
 import 'package:gwangstagram/style.dart' as style;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -11,9 +13,15 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
+import 'firebase_options.dart';
 import 'upload_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (c) => Store1()),
@@ -176,7 +184,7 @@ class _MyAppState extends State<MyApp> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showNotification();
+          showNotification2();
         },
         child: Text('+'),
       ),
@@ -244,7 +252,7 @@ class _MyAppState extends State<MyApp> {
         MainList(
           dataList: dataList,
         ),
-        Text("샵페이지")
+        Shop(),
       ][tab],
 
       bottomNavigationBar: BottomNavigationBar(
